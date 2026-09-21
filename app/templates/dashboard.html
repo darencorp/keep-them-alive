@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Keep Them Alive{% endblock %}
+{% block content %}
+<h1>🌿 Dashboard</h1>
+<p class="season-badge">Season: <strong>{{ settings.season|capitalize }}</strong></p>
+
+<div class="summary">
+  <div class="stat overdue">🚨 Overdue<br><span>{{ counts.overdue }}</span></div>
+  <div class="stat due">💧 Due today<br><span>{{ counts.due }}</span></div>
+  <div class="stat watered">✅ Watered today<br><span>{{ counts.watered_today }}</span></div>
+  <div class="stat ok">🌱 OK<br><span>{{ counts.ok }}</span></div>
+</div>
+
+{% if rows %}
+<div class="plant-cards">
+  {% for row in rows %}
+  <div class="card status-{{ row.status }}">
+    <h3><a href="/plants/{{ row.plant.id }}">{{ row.plant.name }}</a></h3>
+    {% if row.status == "overdue" %}
+      <p class="badge overdue">🥀😱 Overdue since {{ row.plant.overdue_since }}</p>
+    {% elif row.status == "due" %}
+      <p class="badge due">💧 Due today</p>
+    {% elif row.status == "watered_today" %}
+      <p class="badge watered">✅ Watered today</p>
+    {% else %}
+      <p class="badge ok">🌱 Next due {{ row.due_date }}</p>
+    {% endif %}
+    {% if row.status in ("overdue", "due") %}
+    <form method="post" action="/plants/{{ row.plant.id }}/water">
+      <button type="submit">✅ Mark Watered</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p>No plants yet. <a href="/plants/new">Add one</a>.</p>
+{% endif %}
+{% endblock %}

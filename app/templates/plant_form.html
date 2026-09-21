@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if plant else "New" }} Plant{% endblock %}
+{% block content %}
+<h1>{{ "Edit" if plant else "Add" }} Plant</h1>
+<form method="post" action="{{ '/plants/%d/edit' % plant.id if plant else '/plants' }}">
+  <label>Name<br><input type="text" name="name" value="{{ plant.name if plant else '' }}" required></label><br>
+  <label>Species<br><input type="text" name="species" value="{{ (plant.species or '') if plant else '' }}"></label><br>
+  <label>Notes<br><textarea name="notes">{{ (plant.notes or '') if plant else '' }}</textarea></label><br>
+  <label>Summer interval (days)<br>
+    <input type="number" min="1" name="summer_interval_days" value="{{ plant.summer_interval_days if plant else 3 }}" required>
+  </label><br>
+  <label>Winter interval (days)<br>
+    <input type="number" min="1" name="winter_interval_days" value="{{ plant.winter_interval_days if plant else 5 }}" required>
+  </label><br>
+  <button type="submit">Save</button>
+</form>
+{% if plant %}
+<form method="post" action="/plants/{{ plant.id }}/archive" onsubmit="return confirm('Archive this plant?');">
+  <button type="submit" class="danger">Archive plant</button>
+</form>
+{% endif %}
+{% endblock %}

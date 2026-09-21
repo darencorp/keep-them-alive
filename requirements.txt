@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+python-telegram-bot[job-queue]==21.*
+APScheduler>=3.10,<4
+SQLAlchemy>=2.0
+pydantic-settings
+python-dotenv

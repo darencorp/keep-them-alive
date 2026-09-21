@@ -1,0 +1,16 @@
+[Unit]
+Description=Keep Them Alive - plant watering reminders
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/keep_them_alive
+EnvironmentFile=/home/pi/keep_them_alive/.env
+ExecStart=/home/pi/keep_them_alive/.venv/bin/python run.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

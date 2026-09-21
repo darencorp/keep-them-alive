@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Plants - Keep Them Alive{% endblock %}
+{% block content %}
+<h1>🪴 Plants</h1>
+<p><a href="/plants/new">+ Add plant</a></p>
+<table>
+  <thead><tr><th>Name</th><th>Summer (days)</th><th>Winter (days)</th><th></th></tr></thead>
+  <tbody>
+  {% for plant in plants %}
+    <tr>
+      <td><a href="/plants/{{ plant.id }}">{{ plant.name }}</a></td>
+      <td>{{ plant.summer_interval_days }}</td>
+      <td>{{ plant.winter_interval_days }}</td>
+      <td><a href="/plants/{{ plant.id }}/edit">Edit</a></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4">No plants yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ plant.name }} - Keep Them Alive{% endblock %}
+{% block content %}
+<h1>🪴 {{ plant.name }}</h1>
+<p>{{ plant.species or "" }}</p>
+<p>{{ plant.notes or "" }}</p>
+<p>Summer interval: {{ plant.summer_interval_days }} days · Winter interval: {{ plant.winter_interval_days }} days</p>
+<p>Last watered: {{ plant.last_watered_at or "never" }}</p>
+<p>Next due: {{ plant.next_due_at or "-" }}</p>
+{% if plant.is_overdue %}<p class="badge overdue">🥀 Overdue since {{ plant.overdue_since }}</p>{% endif %}
+
+<form method="post" action="/plants/{{ plant.id }}/water">
+  <button type="submit">✅ Mark Watered</button>
+</form>
+
+<p><a href="/plants/{{ plant.id }}/edit">Edit</a></p>
+
+<h2>History</h2>
+<table>
+  <thead><tr><th>When</th><th>Source</th></tr></thead>
+  <tbody>
+  {% for event in events %}
+    <tr><td>{{ event.watered_at }}</td><td>{{ event.source }}</td></tr>
+  {% else %}
+    <tr><td colspan="2">No watering history yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

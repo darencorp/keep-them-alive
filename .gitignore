@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# App data (SQLite DB + WAL files) -- never commit real watering history/tokens
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# OS / editor cruft
+.DS_Store
+.idea/
+.vscode/

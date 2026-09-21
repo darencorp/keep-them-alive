@@ -1,0 +1,15 @@
+services:
+  keep-them-alive:
+    build: .
+    container_name: keep-them-alive
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      # Match the host's timezone so the container's system clock (used for "today"/
+      # "next due date" math) agrees with the TIMEZONE set in .env for the scheduler.
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro

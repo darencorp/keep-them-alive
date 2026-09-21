@@ -1,0 +1,122 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7f2;
+  --card-bg: #ffffff;
+  --text: #1e2a1e;
+  --muted: #6b7a67;
+  --border: #dbe4d6;
+  --overdue: #d64545;
+  --due: #d68a1c;
+  --ok: #2f9e44;
+  --watered: #2b8a3e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12160f;
+    --card-bg: #1b2117;
+    --text: #e7f0e2;
+    --muted: #9db095;
+    --border: #2b3526;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+
+.nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+@media (min-width: 500px) {
+  .summary { grid-template-columns: repeat(4, 1fr); }
+}
+
+.stat {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.stat span { font-size: 1.4rem; font-weight: 700; }
+
+.plant-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.card h3 { margin: 0 0 0.4rem; }
+.card h3 a { color: var(--text); text-decoration: none; }
+
+.badge { font-weight: 600; margin: 0.3rem 0 0.6rem; }
+.badge.overdue, .stat.overdue span { color: var(--overdue); }
+.badge.due, .stat.due span { color: var(--due); }
+.badge.ok, .stat.ok span { color: var(--ok); }
+.badge.watered, .stat.watered span { color: var(--watered); }
+
+button {
+  background: var(--ok);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button.danger { background: var(--overdue); }
+
+table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+th, td { text-align: left; padding: 0.4rem; border-bottom: 1px solid var(--border); }
+
+label { display: block; margin: 0.5rem 0 0.2rem; color: var(--muted); }
+input, textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 1rem;
+}

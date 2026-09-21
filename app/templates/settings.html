@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Settings - Keep Them Alive{% endblock %}
+{% block content %}
+<h1>⚙️ Settings</h1>
+
+<h2>Season</h2>
+<form method="post" action="/settings/season">
+  <label><input type="radio" name="season" value="summer" {% if settings.season == "summer" %}checked{% endif %}> ☀️ Summer</label>
+  <label><input type="radio" name="season" value="winter" {% if settings.season == "winter" %}checked{% endif %}> ❄️ Winter</label>
+  <button type="submit">Update season</button>
+</form>
+
+<h2>Reminders</h2>
+<form method="post" action="/settings/reminders">
+  <label>Start time<br><input type="time" name="reminder_start_time" value="{{ settings.reminder_start_time }}"></label><br>
+  <label>Interval hours<br><input type="number" min="1" name="reminder_interval_hours" value="{{ settings.reminder_interval_hours }}"></label><br>
+  <label>Max reminders/day<br><input type="number" min="1" name="max_reminders_per_day" value="{{ settings.max_reminders_per_day }}"></label><br>
+  <button type="submit">Save</button>
+</form>
+{% endblock %}
