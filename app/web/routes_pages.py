@@ -7,27 +7,12 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from app.core.watering_logic import get_settings, next_due_date
+from app.core.watering_logic import STATUS_ORDER, get_settings, plant_status_info, sort_key
 from app.db.models import Plant, WateringEvent
 from app.db.session import get_db
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
-
-_STATUS_ORDER = {"overdue": 0, "due": 1, "watered_today": 2, "ok": 3}
-
-
-def _plant_status(plant: Plant, settings, today: date) -> dict:
-    due_date = next_due_date(plant, settings)
-    if plant.is_overdue:
-        status = "overdue"
-    elif plant.last_watered_at is not None and plant.last_watered_at.date() == today:
-        status = "watered_today"
-    elif due_date <= today:
-        status = "due"
-    else:
-        status = "ok"
-    return {"plant": plant, "due_date": due_date, "status": status}
 
 
 @router.get("/")
@@ -35,10 +20,10 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     today = date.today()
     settings = get_settings(db)
     plants = db.query(Plant).filter_by(is_archived=False).order_by(Plant.name).all()
-    rows = [_plant_status(p, settings, today) for p in plants]
-    rows.sort(key=lambda r: _STATUS_ORDER[r["status"]])
+    rows = [{"plant": p, **plant_status_info(p, settings, today)} for p in plants]
+    rows.sort(key=sort_key)
 
-    counts = {status: sum(1 for r in rows if r["status"] == status) for status in _STATUS_ORDER}
+    counts = {status: sum(1 for r in rows if r["status"] == status) for status in STATUS_ORDER}
 
     return templates.TemplateResponse(
         request,

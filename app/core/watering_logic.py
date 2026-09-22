@@ -42,3 +42,34 @@ def reminder_slot_times(settings: GlobalSettings, on_date: date) -> list[datetim
         start + timedelta(hours=settings.reminder_interval_hours * n)
         for n in range(settings.max_reminders_per_day)
     ]
+
+
+# Lower number = more urgent = should sort first, both on the web dashboard and in Telegram.
+STATUS_ORDER = {"overdue": 0, "due": 1, "watered_today": 2, "ok": 3}
+
+
+def plant_status_info(plant: Plant, settings: GlobalSettings, today: date | None = None) -> dict:
+    """Shared by the web dashboard and Telegram /status so both sort plants the same way:
+    most urgent (longest overdue, or soonest due) first.
+    """
+    today = today or date.today()
+    due_date = next_due_date(plant, settings)
+
+    if plant.is_overdue:
+        status = "overdue"
+        sort_date = plant.overdue_since or due_date
+    elif plant.last_watered_at is not None and plant.last_watered_at.date() == today:
+        status = "watered_today"
+        sort_date = due_date
+    elif due_date <= today:
+        status = "due"
+        sort_date = due_date
+    else:
+        status = "ok"
+        sort_date = due_date
+
+    return {"due_date": due_date, "status": status, "sort_date": sort_date}
+
+
+def sort_key(info: dict) -> tuple:
+    return (STATUS_ORDER[info["status"]], info["sort_date"])

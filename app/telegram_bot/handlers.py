@@ -5,7 +5,7 @@ from datetime import date
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from app.core.watering_logic import get_settings, next_due_date
+from app.core.watering_logic import get_settings, plant_status_info, sort_key
 from app.db.models import Plant, TelegramChat
 from app.db.session import get_session
 
@@ -43,25 +43,29 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     with get_session() as session:
         settings = get_settings(session)
         plants = session.query(Plant).filter_by(is_archived=False).order_by(Plant.name).all()
-
-        due_lines, overdue_lines, ok_lines, buttons = [], [], [], []
-
-        for plant in plants:
-            due_date = next_due_date(plant, settings)
-            if plant.is_overdue:
-                overdue_lines.append(f"🥀 {plant.name} (overdue since {plant.overdue_since})")
-                buttons.append(
-                    [InlineKeyboardButton(f"✅ Water {plant.name}", callback_data=f"water:{plant.id}")]
-                )
-            elif due_date <= today:
-                due_lines.append(f"💧 {plant.name} (due {due_date})")
-                buttons.append(
-                    [InlineKeyboardButton(f"✅ Water {plant.name}", callback_data=f"water:{plant.id}")]
-                )
-            else:
-                ok_lines.append(f"🌱 {plant.name} (next due {due_date})")
-
+        # Sorted most urgent first: longest-overdue, then soonest-due, then soonest-upcoming.
+        rows = sorted(
+            ({"plant": p, **plant_status_info(p, settings, today)} for p in plants),
+            key=sort_key,
+        )
         season = settings.season
+
+    due_lines, overdue_lines, ok_lines, buttons = [], [], [], []
+
+    for row in rows:
+        plant, due_date, status = row["plant"], row["due_date"], row["status"]
+        if status == "overdue":
+            overdue_lines.append(f"🥀 {plant.name} (overdue since {plant.overdue_since})")
+            buttons.append(
+                [InlineKeyboardButton(f"✅ Water {plant.name}", callback_data=f"water:{plant.id}")]
+            )
+        elif status == "due":
+            due_lines.append(f"💧 {plant.name} (due {due_date})")
+            buttons.append(
+                [InlineKeyboardButton(f"✅ Water {plant.name}", callback_data=f"water:{plant.id}")]
+            )
+        else:
+            ok_lines.append(f"🌱 {plant.name} (next due {due_date})")
 
     lines = [f"🗓 Season: {season.capitalize()}", ""]
     if overdue_lines:
