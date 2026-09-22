@@ -8,6 +8,7 @@ from pathlib import Path
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from telegram.error import InvalidToken
 
 from app.config import settings
 from app.db.base import Base, engine
@@ -20,6 +21,13 @@ from app.web.routes_pages import router as pages_router
 
 logging.basicConfig(level=settings.log_level, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
+
+# httpx/httpcore log full request URLs at INFO, and python-telegram-bot's API calls embed the
+# bot token in the URL path (https://api.telegram.org/bot<TOKEN>/method) -- silence them so the
+# token never lands in logs (and from there, potentially in a terminal scrollback, log file, or
+# support/chat transcript).
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 
 def create_fastapi_app() -> FastAPI:
@@ -54,9 +62,16 @@ async def main() -> None:
         await telegram_app.updater.start_polling()
         telegram_started = True
         logger.info("Telegram bot polling started")
+    except InvalidToken:
+        # python-telegram-bot's own exception message embeds the raw token -- never let
+        # logger.exception() (or str(e)) anywhere near this one.
+        logger.error(
+            "Telegram bot failed to start: TELEGRAM_BOT_TOKEN is invalid or was rejected by "
+            "Telegram. Continuing with the web dashboard only -- fix .env and restart to retry."
+        )
     except Exception:
         logger.exception(
-            "Telegram bot failed to start (bad token or no network?) -- "
+            "Telegram bot failed to start (network issue?) -- "
             "continuing with the web dashboard only. It will retry on next restart."
         )
 
