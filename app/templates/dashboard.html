@@ -5,10 +5,10 @@
 <p class="season-badge">Season: <strong>{{ settings.season|capitalize }}</strong></p>
 
 <div class="summary">
-  <div class="stat overdue">🚨 Overdue<br><span>{{ counts.overdue }}</span></div>
-  <div class="stat due">💧 Due today<br><span>{{ counts.due }}</span></div>
-  <div class="stat watered">✅ Watered today<br><span>{{ counts.watered_today }}</span></div>
   <div class="stat ok">🌱 OK<br><span>{{ counts.ok }}</span></div>
+  <div class="stat watered">✅ Watered today<br><span>{{ counts.watered_today }}</span></div>
+  <div class="stat due">💧 Due today<br><span>{{ counts.due }}</span></div>
+  <div class="stat overdue">🚨 Overdue<br><span>{{ counts.overdue }}</span></div>
 </div>
 
 {% if rows %}
