@@ -169,4 +169,4 @@ async def send_overdue_nag_job(plant_id: int) -> None:
         name = plant.name
         since = plant.overdue_since.isoformat() if plant.overdue_since else "?"
 
-    await _broadcast(overdue_nag(name, since))
+    await _broadcast(overdue_nag(name, since), reply_markup=_watered_button(plant_id))
